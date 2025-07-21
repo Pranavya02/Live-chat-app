@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CodTech Chat</title>
+  <style>
+    body { font-family: Arial; margin: 0; padding: 0; background: #f7f7f7; }
+    h2 { text-align: center; }
+    #chat-box { height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; margin: 10px; background: #fff; }
+    #typing { font-style: italic; color: grey; margin-left: 10px; }
+    #input, #send { margin: 10px; padding: 10px; }
+    #input { width: 70%; }
+    #send { cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h2>💬 CodTech Live Chat</h2>
+  <div id="chat-box"></div>
+  <p id="typing"></p>
+  <input id="input" placeholder="Type your message..." autocomplete="off" />
+  <button id="send">Send</button>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const input = document.getElementById('input');
+    const chatBox = document.getElementById('chat-box');
+    const typingMsg = document.getElementById('typing');
+
+    let username = "";
+    while (!username) {
+      username = prompt("Enter your name:");
+    }
+    socket.emit('join', username);
+
+    document.getElementById('send').onclick = () => {
+      const msg = input.value.trim();
+      if (msg) {
+        socket.emit('chat message', msg);
+        input.value = '';
+      }
+    };
+
+    input.addEventListener('input', () => {
+      socket.emit('typing');
+    });
+
+    socket.on('chat message', msg => {
+      typingMsg.textContent = '';
+      const msgElem = document.createElement('div');
+      msgElem.textContent = msg;
+      chatBox.appendChild(msgElem);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    });
+
+    socket.on('typing', msg => {
+      typingMsg.textContent = msg;
+    });
+  </script>
+</body>
+</html>
