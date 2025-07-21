@@ -1,4 +1,4 @@
-# CodTech Chat App 🚀
+# Chat Application
 
 A simple real-time chat app using Node.js, Express, and Socket.IO.
 
